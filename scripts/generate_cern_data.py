@@ -29,6 +29,35 @@ def load_checkpoint(checkpoint_path: Path) -> dict:
     return {"completed": [], "started_at": None, "last_updated": None}
 
 
+def detect_existing_files(output_dir: Path, materials: list, scenarios: list) -> list:
+    """Detect already-generated files and return list of completed tasks."""
+    completed = []
+    for material in materials:
+        material_dir = output_dir / material
+        for scenario in scenarios:
+            pkl_file = material_dir / f"{scenario}.pkl"
+            metadata_file = material_dir / f"{scenario}_metadata.json"
+            if pkl_file.exists() and metadata_file.exists():
+                completed.append(f"{material}/{scenario}")
+    return completed
+
+
+def load_or_rebuild_checkpoint(checkpoint_path: Path, output_dir: Path, materials: list, scenarios: list) -> dict:
+    """Load checkpoint, or rebuild it from existing files if missing."""
+    checkpoint = load_checkpoint(checkpoint_path)
+    
+    # If no checkpoint but files exist, rebuild from existing data
+    if not checkpoint["completed"]:
+        existing = detect_existing_files(output_dir, materials, scenarios)
+        if existing:
+            print(f"No checkpoint found, but detected {len(existing)} existing files. Rebuilding checkpoint...")
+            checkpoint["completed"] = existing
+            checkpoint["started_at"] = datetime.now().isoformat()
+            save_checkpoint(checkpoint_path, checkpoint)
+    
+    return checkpoint
+
+
 def save_checkpoint(checkpoint_path: Path, checkpoint: dict):
     """Save checkpoint file."""
     checkpoint["last_updated"] = datetime.now().isoformat()
@@ -56,21 +85,26 @@ def generate_small_dataset(output_dir: Path, resume: bool = True):
     
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    materials = ['Si', 'Fe', 'W', 'Cu', 'Al']
+    scenarios = ['plasma_oscillation', 'beam_instability', 'single_particle']
+    
     checkpoint_path = output_dir / ".checkpoint.json"
-    checkpoint = load_checkpoint(checkpoint_path) if resume else {"completed": [], "started_at": None, "last_updated": None}
+    if resume:
+        checkpoint = load_or_rebuild_checkpoint(checkpoint_path, output_dir, materials, scenarios)
+    else:
+        checkpoint = {"completed": [], "started_at": None, "last_updated": None}
     
     if checkpoint["started_at"] is None:
         checkpoint["started_at"] = datetime.now().isoformat()
-    
-    materials = ['Si', 'Fe', 'W', 'Cu', 'Al']
-    scenarios = ['plasma_oscillation', 'beam_instability', 'single_particle']
     
     # Count completed vs total
     total_tasks = len(materials) * len(scenarios)
     completed_count = len(checkpoint["completed"])
     
     if resume and completed_count > 0:
-        print(f"\nResuming from checkpoint: {completed_count}/{total_tasks} tasks already completed")
+        print(f"\nResuming: {completed_count}/{total_tasks} tasks already completed")
+        for task in checkpoint["completed"]:
+            print(f"  ✓ {task}")
     
     plasma_gen = PlasmaGenerator()
     beam_gen = BeamInstabilityGenerator()
@@ -181,21 +215,26 @@ def generate_comprehensive_dataset(output_dir: Path, resume: bool = True):
     
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    materials = ['Si', 'Fe', 'W', 'Cu', 'Al']
+    scenarios = ['plasma_oscillation', 'beam_instability', 'single_particle']
+    
     checkpoint_path = output_dir / ".checkpoint.json"
-    checkpoint = load_checkpoint(checkpoint_path) if resume else {"completed": [], "started_at": None, "last_updated": None}
+    if resume:
+        checkpoint = load_or_rebuild_checkpoint(checkpoint_path, output_dir, materials, scenarios)
+    else:
+        checkpoint = {"completed": [], "started_at": None, "last_updated": None}
     
     if checkpoint["started_at"] is None:
         checkpoint["started_at"] = datetime.now().isoformat()
-    
-    materials = ['Si', 'Fe', 'W', 'Cu', 'Al']
-    scenarios = ['plasma_oscillation', 'beam_instability', 'single_particle']
     
     # Count completed vs total
     total_tasks = len(materials) * len(scenarios)
     completed_count = len(checkpoint["completed"])
     
     if resume and completed_count > 0:
-        print(f"\nResuming from checkpoint: {completed_count}/{total_tasks} tasks already completed")
+        print(f"\nResuming: {completed_count}/{total_tasks} tasks already completed")
+        for task in checkpoint["completed"]:
+            print(f"  ✓ {task}")
     
     plasma_gen = PlasmaGenerator()
     beam_gen = BeamInstabilityGenerator()
