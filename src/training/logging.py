@@ -66,7 +66,7 @@ class TrainingLogger:
         
         # Console formatting
         self.console_width = 80
-    
+
     def log_hyperparameters(self, hparams: Dict[str, Any]):
         """Log hyperparameters for the experiment."""
         # Save to JSON
@@ -160,7 +160,7 @@ class TrainingLogger:
         self.log_metrics(train_metrics, epoch, prefix="epoch/train")
         if val_metrics:
             self.log_metrics(val_metrics, epoch, prefix="epoch/val")
-    
+
     def log_model_graph(self, model: torch.nn.Module, input_data: Any):
         """Log model computational graph to TensorBoard."""
         if self.tensorboard_writer is not None:
