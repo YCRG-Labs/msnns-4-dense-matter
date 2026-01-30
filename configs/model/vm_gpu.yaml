@@ -1,0 +1,64 @@
+# Model Configuration for VM/GPU Training
+# Optimized for GPU with larger batch sizes
+
+# Device configuration
+device: cuda  # Will auto-detect GPU, fallback to CPU
+mixed_precision: true  # Use automatic mixed precision for faster training
+
+# Model architecture
+name: MultiScaleModel
+
+# GNN Configuration
+gnn:
+  num_layers: 3
+  hidden_dim: 128
+  edge_dim: 64
+  aggr: add
+  activation: relu
+  dropout: 0.1
+  use_batch_norm: true
+  residual: true
+
+# Transformer Configuration  
+transformer:
+  num_layers: 4
+  d_model: 256
+  num_heads: 8
+  d_ff: 1024
+  dropout: 0.1
+  activation: gelu
+  use_layer_norm: true
+  use_positional_encoding: true
+
+# Neural ODE Configuration
+neural_ode:
+  hidden_dim: 128
+  num_layers: 3
+  solver: dopri5
+  rtol: 1.0e-5
+  atol: 1.0e-7
+  adjoint: true  # Use adjoint method for memory efficiency
+  adaptive: true
+
+# Decoder Configuration
+decoder:
+  hidden_dim: 128
+  num_layers: 3
+  output_dim: 3  # Position predictions
+  activation: relu
+  dropout: 0.1
+
+# Input/Output dimensions
+input_dim: 13  # [pos(3), mom(3), charge(1), mass(1), species(5)]
+conditioning_dim: 7  # [density(1), energy(1), material(5)]
+latent_dim: 256
+
+# Physics constraints
+use_conservation_constraints: true
+use_symmetry_constraints: true
+use_known_limits: true
+
+# Uncertainty quantification
+use_uncertainty: true
+uncertainty_method: ensemble  # ensemble or dropout
+num_ensemble_members: 5

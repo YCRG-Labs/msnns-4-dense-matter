@@ -1,0 +1,28 @@
+# Main Configuration File
+# This is the entry point for Hydra configuration
+
+defaults:
+  - model: default
+  - training: pretraining
+  - _self_
+
+# Experiment configuration
+experiment:
+  name: multi_scale_physics
+  seed: 42
+  deterministic: false  # Set to true for reproducible results (may reduce performance)
+
+# Paths
+paths:
+  data_root: data
+  checkpoint_root: checkpoints
+  log_root: logs
+  output_root: outputs
+
+# Hydra configuration
+hydra:
+  run:
+    dir: outputs/${experiment.name}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: outputs/${experiment.name}/sweeps
+    subdir: ${hydra.job.num}

@@ -1,0 +1,76 @@
+# VM/Cloud Pretraining Configuration
+# Optimized for Linux VM with GPU support
+
+# Training data
+data:
+  train_path: data/synthetic_small
+  val_path: null
+  batch_size: 16  # Increased for GPU
+  num_workers: 4  # Use multiprocessing on Linux
+  shuffle: true
+  
+  # Data diversity
+  materials: [Si, Fe, W, Cu, Al]
+  density_range: [0.001, 10.0]  # particles/nm³
+  energy_range: [0.1, 100.0]  # MeV
+  temperature_range: [100.0, 10000.0]  # K
+  trajectory_length: [100, 1000]  # timesteps
+  dt: 0.5  # femtoseconds
+
+# Optimizer
+optimizer:
+  type: adamw
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+
+# Learning rate scheduler
+scheduler:
+  type: cosine_annealing
+  T_max: 50  # epochs
+  eta_min: 1.0e-6
+  warmup_epochs: 5
+  warmup_start_lr: 1.0e-5
+
+# Training loop
+training:
+  epochs: 50
+  gradient_clip_norm: 1.0
+  log_interval: 10  # batches
+  val_interval: 1  # epochs
+  checkpoint_interval: 5  # epochs
+  early_stopping_patience: 15
+
+# Loss weights
+loss_weights:
+  autoregressive: 1.0
+  contrastive: 0.5
+  masked_particle: 0.5
+
+# Contrastive learning
+contrastive:
+  temperature: 0.07
+  similarity_threshold: 0.1
+
+# Masked particle prediction
+masked_particle:
+  mask_ratio: 0.15
+  mask_strategy: random
+
+# Logging
+logging:
+  use_tensorboard: true
+  tensorboard_dir: logs/pretraining_vm
+  use_wandb: false
+  wandb_project: multi-scale-physics
+  wandb_entity: null
+  log_gradients: false
+  log_weights: false
+
+# Checkpointing
+checkpointing:
+  save_dir: checkpoints/pretraining_vm
+  save_best_only: false
+  monitor_metric: val_loss
+  mode: min

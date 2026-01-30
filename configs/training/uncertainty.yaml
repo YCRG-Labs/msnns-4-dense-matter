@@ -1,0 +1,98 @@
+# Uncertainty Calibration Configuration
+# Bayesian uncertainty estimation with deep ensembles, MC dropout, and temperature scaling
+
+# Training data
+data:
+  train_path: data/finetune_train
+  val_path: data/finetune_val
+  test_path: data/test
+  batch_size: 16
+  num_workers: 4
+  shuffle: true
+
+# Pretrained checkpoint
+pretrained_checkpoint: checkpoints/finetuning/best_model.pt
+
+# Uncertainty estimation method
+uncertainty_method: ensemble  # ensemble, mc_dropout, or aleatoric
+
+# Deep Ensemble configuration
+ensemble:
+  num_models: 5
+  different_seeds: true
+  parallel_training: false  # Train models in parallel if multiple GPUs
+
+# MC Dropout configuration
+mc_dropout:
+  dropout_rate: 0.1
+  num_samples: 50
+  apply_to_all_layers: true
+
+# Aleatoric uncertainty configuration
+aleatoric:
+  predict_variance: true
+  loss_type: nll  # negative log-likelihood
+  min_variance: 1.0e-6  # Minimum predicted variance for stability
+
+# Temperature scaling
+temperature_scaling:
+  enabled: true
+  calibration_data: val  # Use validation set for calibration
+  optimizer: lbfgs
+  max_iter: 50
+
+# Optimizer (for aleatoric training)
+optimizer:
+  type: adamw
+  lr: 1.0e-4
+  weight_decay: 1.0e-5
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+
+# Learning rate scheduler
+scheduler:
+  type: cosine_annealing
+  T_max: 30  # epochs
+  eta_min: 1.0e-7
+  warmup_epochs: 2
+  warmup_start_lr: 1.0e-6
+
+# Training loop (for aleatoric)
+training:
+  epochs: 30
+  gradient_clip_norm: 0.5
+  log_interval: 10  # batches
+  val_interval: 1  # epochs
+  checkpoint_interval: 5  # epochs
+  early_stopping_patience: 8
+
+# Loss weights (for aleatoric)
+loss_weights:
+  nll: 1.0
+  prediction: 0.1  # Additional MSE loss
+
+# Uncertainty evaluation
+evaluation:
+  compute_calibration_metrics: true
+  calibration_bins: 10
+  compute_sharpness: true
+  compute_coverage: true
+  confidence_levels: [0.68, 0.95, 0.99]
+
+# Logging
+logging:
+  use_tensorboard: true
+  tensorboard_dir: logs/uncertainty
+  use_wandb: false
+  wandb_project: multi-scale-physics
+  wandb_entity: null
+  log_uncertainty_distributions: true
+  log_calibration_plots: true
+
+# Checkpointing
+checkpointing:
+  save_dir: checkpoints/uncertainty
+  save_best_only: false
+  monitor_metric: val_nll
+  mode: min
+  save_ensemble_separately: true  # Save each ensemble member separately

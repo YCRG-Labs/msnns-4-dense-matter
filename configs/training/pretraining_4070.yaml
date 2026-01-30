@@ -1,0 +1,77 @@
+# Windows RTX 4070 Laptop Configuration
+# Optimized for 8GB VRAM laptop GPU
+
+# Training data
+data:
+  train_path: data/synthetic_small
+  val_path: null
+  batch_size: 4  # Conservative for 8GB VRAM (can try 8 if no OOM)
+  num_workers: 0  # Windows compatibility
+  shuffle: true
+  pin_memory: true
+  
+  # Data diversity
+  materials: [Si, Fe, W, Cu, Al]
+  density_range: [0.001, 10.0]
+  energy_range: [0.1, 100.0]
+  temperature_range: [100.0, 10000.0]
+  trajectory_length: [100, 1000]
+  dt: 0.5
+
+# Optimizer
+optimizer:
+  type: adamw
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+
+# Learning rate scheduler
+scheduler:
+  type: cosine_annealing
+  T_max: 50
+  eta_min: 1.0e-6
+  warmup_epochs: 5
+  warmup_start_lr: 1.0e-5
+
+# Training loop
+training:
+  epochs: 50
+  gradient_clip_norm: 1.0
+  log_interval: 10
+  val_interval: 1
+  checkpoint_interval: 5
+  early_stopping_patience: 15
+
+# Loss weights
+loss_weights:
+  autoregressive: 1.0
+  contrastive: 0.5
+  masked_particle: 0.5
+
+# Contrastive learning
+contrastive:
+  temperature: 0.07
+  similarity_threshold: 0.1
+
+# Masked particle prediction
+masked_particle:
+  mask_ratio: 0.15
+  mask_strategy: random
+
+# Logging
+logging:
+  use_tensorboard: true
+  tensorboard_dir: logs/pretraining_4070
+  use_wandb: false
+  wandb_project: multi-scale-physics
+  wandb_entity: null
+  log_gradients: false
+  log_weights: false
+
+# Checkpointing
+checkpointing:
+  save_dir: checkpoints/pretraining_4070
+  save_best_only: false
+  monitor_metric: val_loss
+  mode: min

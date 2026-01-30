@@ -1,0 +1,63 @@
+# Model Configuration
+# Hyperparameters for the multi-scale neural network architecture
+
+# Graph Neural Network (GNN) Layer
+gnn:
+  input_dim: 11  # 3 (pos) + 3 (mom) + 1 (charge) + 1 (mass) + 3 (species one-hot for 3 species)
+  hidden_dim: 128
+  num_layers: 4
+  cutoff_radius: 5.0  # nm
+  edge_dim: 7  # 3 (relative pos) + 1 (distance) + 3 (relative mom)
+  activation: relu
+  dropout: 0.1
+
+# Transformer Layer
+transformer:
+  input_dim: 128  # Should match gnn.hidden_dim
+  hidden_dim: 256
+  num_heads: 8
+  num_layers: 1
+  dropout: 0.1
+  feedforward_dim: 512
+  rpe_hidden_dim: 64  # Relative position encoding hidden dimension
+
+# Encoder
+encoder:
+  input_dim: 256  # Should match transformer.hidden_dim
+  latent_dim: 32
+  conditioning_dim: 7  # 2 (density, energy) + 5 (material one-hot for 5 materials)
+  hidden_dims: [512, 256, 128]
+  dropout: 0.1
+  activation: relu
+
+# Neural ODE
+neural_ode:
+  latent_dim: 32  # Should match encoder.latent_dim
+  conditioning_dim: 7  # Should match encoder.conditioning_dim
+  hidden_dims: [256, 256]
+  time_encoding_freq: 1.0  # ω for sin(ωt), cos(ωt)
+  solver: dopri5
+  rtol: 1.0e-3
+  atol: 1.0e-4
+  adjoint: true  # Use adjoint method for memory efficiency
+
+# Decoder
+decoder:
+  latent_dim: 32  # Should match encoder.latent_dim
+  particle_dim: 256  # Should match transformer.hidden_dim
+  conditioning_dim: 7  # Should match encoder.conditioning_dim
+  num_observables: 5  # beam width (2), energy spread (1), emittance (2)
+  particle_hidden_dims: [256, 128]
+  observable_hidden_dims: [128, 64]
+  dropout: 0.1
+  activation: relu
+  predict_variance: false  # Set to true for aleatoric uncertainty
+
+# Material and species configuration
+materials:
+  num_materials: 5  # Si, Fe, W, Cu, Al
+  num_species: 3  # Different particle species
+
+# Device configuration
+device: cuda  # cuda or cpu
+mixed_precision: false  # Use automatic mixed precision (AMP)
