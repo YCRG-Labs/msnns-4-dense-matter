@@ -912,8 +912,8 @@ def load_md_trajectories(data_path: str, format: str = 'auto', recursive: bool =
             # Recursively search subdirectories
             for root, dirs, files in os.walk(data_path):
                 for filename in files:
-                    # Skip metadata files
-                    if filename.endswith('_metadata.json') or filename == 'summary.json':
+                    # Skip metadata and checkpoint files
+                    if filename.endswith('_metadata.json') or filename == 'summary.json' or filename == '.checkpoint.json':
                         continue
                     
                     filepath = os.path.join(root, filename)
