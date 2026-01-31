@@ -49,8 +49,9 @@ def load_model(checkpoint_path: str, config_path: str = None, device: str = 'cpu
     # Load checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     
-    # Always load config from file - checkpoint config is PretrainingConfig, not model config
-    config = load_config('config')
+    # Load config from file - need the model sub-config
+    full_config = load_config('config')
+    config = full_config.model  # Extract model config
     
     # Initialize model
     model = MultiScaleModel(config)
