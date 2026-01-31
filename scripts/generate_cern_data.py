@@ -209,9 +209,9 @@ def generate_small_dataset(output_dir: Path, resume: bool = True):
 
 
 def generate_medium_dataset(output_dir: Path, resume: bool = True):
-    """Generate medium dataset (250 particles, 150 timesteps) - optimized for 24GB GPU."""
+    """Generate medium dataset (150 particles, 150 timesteps) - optimized for 24GB GPU."""
     print("Generating medium synthetic dataset...")
-    print("Parameters: 250 particles, 150 timesteps")
+    print("Parameters: 150 particles, 150 timesteps")
     
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -244,11 +244,11 @@ def generate_medium_dataset(output_dir: Path, resume: bool = True):
         material_dir = output_dir / material
         material_dir.mkdir(exist_ok=True)
         
-        # Plasma oscillation - 250 particles, 150 timesteps
+        # Plasma oscillation - 150 particles, 150 timesteps
         if not is_completed(checkpoint, material, 'plasma_oscillation'):
             print(f"\n[{material}] Generating plasma oscillation...")
             plasma_traj = plasma_gen.generate(
-                n_particles=250,
+                n_particles=150,
                 density=1.0,
                 temperature=300.0,
                 duration=37.5,  # 150 timesteps * 0.25 dt
@@ -271,7 +271,7 @@ def generate_medium_dataset(output_dir: Path, resume: bool = True):
         if not is_completed(checkpoint, material, 'beam_instability'):
             print(f"[{material}] Generating beam instability...")
             beam_traj = beam_gen.generate(
-                n_particles=250,
+                n_particles=150,
                 beam_velocity=1.0,
                 density=1.0,
                 duration=37.5,
@@ -294,7 +294,7 @@ def generate_medium_dataset(output_dir: Path, resume: bool = True):
         if not is_completed(checkpoint, material, 'single_particle'):
             print(f"[{material}] Generating single particle...")
             single_traj = single_gen.generate(
-                n_particles=250,
+                n_particles=150,
                 density=0.01,
                 duration=37.5,
                 dt=0.25,
@@ -315,7 +315,7 @@ def generate_medium_dataset(output_dir: Path, resume: bool = True):
     # Save summary
     summary = {
         "materials": materials,
-        "n_particles": 250,
+        "n_particles": 150,
         "duration": 37.5,
         "dt": 0.25,
         "num_timesteps": 150,
@@ -333,7 +333,7 @@ def generate_medium_dataset(output_dir: Path, resume: bool = True):
     
     print(f"\n✓ Generated 15 medium trajectories in {output_dir}")
     print("  - 5 materials × 3 scenarios")
-    print("  - 250 particles per simulation")
+    print("  - 150 particles per simulation")
     print("  - 150 timesteps each")
     print("\nReady for training!")
 
