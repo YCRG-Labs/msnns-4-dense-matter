@@ -47,13 +47,8 @@ def load_model(checkpoint_path: str, config_path: str = None, device: str = 'cpu
     # Load checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     
-    # Load config if provided, otherwise use config from checkpoint
-    if config_path:
-        config = load_config(config_path)
-    elif 'config' in checkpoint:
-        config = checkpoint['config']
-    else:
-        raise ValueError("No configuration found. Provide config_path or ensure checkpoint contains config.")
+    # Always load config from file - checkpoint config is PretrainingConfig, not model config
+    config = load_config('config')
     
     # Initialize model
     model = MultiScaleModel(config)
