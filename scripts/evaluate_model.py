@@ -30,7 +30,7 @@ from src.evaluation.metrics import (
 )
 from src.data.structures import TrajectoryData, GraphData
 from src.data.loader import MDDataLoader
-from src.config.config_loader import load_config
+from src.config.config_loader import load_config, create_model_from_config
 
 
 def load_model(checkpoint_path: str, config_path: str = None, device: str = 'cpu') -> MultiScaleModel:
@@ -49,12 +49,9 @@ def load_model(checkpoint_path: str, config_path: str = None, device: str = 'cpu
     # Load checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     
-    # Load config from file - need the model sub-config
+    # Load config and create model using the same method as training
     full_config = load_config('config')
-    config = full_config.model  # Extract model config
-    
-    # Initialize model
-    model = MultiScaleModel(config)
+    model = create_model_from_config(full_config)
     
     # Load state dict
     if 'model_state_dict' in checkpoint:
