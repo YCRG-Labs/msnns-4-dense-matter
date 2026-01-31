@@ -594,8 +594,10 @@ class DataPreprocessor:
         self.num_species = 5  # Si, Fe, W, Cu, Al
         self.num_materials = 5
     
-    def fit(self, trajectories: List[TrajectoryData]):
+    def fit(self, trajectories: List[TrajectoryData], sample_size: int = 100000):
         """Compute normalization statistics from training data.
+        
+        Uses sampling for efficiency when dealing with large datasets.
         
         Computes mean and standard deviation for:
         - Particle positions (3D)
@@ -605,30 +607,63 @@ class DataPreprocessor:
         
         Args:
             trajectories: List of trajectory data to compute statistics from
+            sample_size: Max particles to sample for stats (default 100k)
         """
         if not trajectories:
             raise ValueError("Cannot fit on empty trajectory list")
         
-        all_pos = []
-        all_mom = []
-        all_density = []
-        all_energy = []
-        
-        # Collect all data
+        # Sample states for efficiency
+        all_states = []
         for traj in trajectories:
-            for state in traj.states:
-                for p in state.particles:
-                    all_pos.append(p.position)
-                    all_mom.append(p.momentum)
-                all_density.append(state.density)
-                all_energy.append(state.energy)
+            all_states.extend(traj.states)
         
-        if not all_pos:
+        if not all_states:
+            raise ValueError("No states found in trajectories")
+        
+        # Collect density/energy from all states (fast)
+        all_density = [s.density for s in all_states]
+        all_energy = [s.energy for s in all_states]
+        
+        # Sample particles for position/momentum stats
+        # Instead of iterating all 15M particles, sample uniformly
+        total_particles = sum(len(s.particles) for s in all_states)
+        
+        if total_particles <= sample_size:
+            # Small dataset - use all particles
+            sampled_pos = []
+            sampled_mom = []
+            for state in all_states:
+                for p in state.particles:
+                    sampled_pos.append(p.position)
+                    sampled_mom.append(p.momentum)
+        else:
+            # Large dataset - sample particles
+            logger.info(f"Sampling {sample_size} particles from {total_particles} total for normalization stats...")
+            sampled_pos = []
+            sampled_mom = []
+            
+            # Sample states proportionally
+            samples_per_state = max(1, sample_size // len(all_states))
+            
+            for state in all_states:
+                n_particles = len(state.particles)
+                n_sample = min(samples_per_state, n_particles)
+                indices = np.random.choice(n_particles, n_sample, replace=False)
+                
+                for idx in indices:
+                    p = state.particles[idx]
+                    sampled_pos.append(p.position)
+                    sampled_mom.append(p.momentum)
+                
+                if len(sampled_pos) >= sample_size:
+                    break
+        
+        if not sampled_pos:
             raise ValueError("No particles found in trajectories")
         
         # Stack into tensors
-        all_pos = torch.stack(all_pos)  # (N_total, 3)
-        all_mom = torch.stack(all_mom)  # (N_total, 3)
+        all_pos = torch.stack(sampled_pos)  # (N_sampled, 3)
+        all_mom = torch.stack(sampled_mom)  # (N_sampled, 3)
         
         # Compute statistics
         self.pos_mean = all_pos.mean(dim=0)  # (3,)
