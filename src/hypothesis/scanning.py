@@ -74,7 +74,11 @@ def scan_density_space(
             
             # Encode to latent space
             z = model.encode(data)  # (1, latent_dim)
-            latent_states.append(z)
+            latent_states.append(z.cpu())  # Move to CPU immediately
+            
+            # Clear CUDA cache to prevent memory accumulation
+            if device == 'cuda':
+                torch.cuda.empty_cache()
     
     # Stack latent states
     latent_states = torch.cat(latent_states, dim=0)  # (num_densities, latent_dim)
