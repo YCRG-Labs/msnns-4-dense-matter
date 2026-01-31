@@ -3,7 +3,7 @@
 
 # Graph Neural Network (GNN) Layer
 gnn:
-  input_dim: 11  # 3 (pos) + 3 (mom) + 1 (charge) + 1 (mass) + 3 (species one-hot for 3 species)
+  input_dim: 13  # 3 (pos) + 3 (mom) + 1 (charge) + 1 (mass) + 5 (species one-hot for 5 species)
   hidden_dim: 128
   num_layers: 4
   cutoff_radius: 5.0  # nm
@@ -56,7 +56,7 @@ decoder:
 # Material and species configuration
 materials:
   num_materials: 5  # Si, Fe, W, Cu, Al
-  num_species: 3  # Different particle species
+  num_species: 5  # Si, Fe, W, Cu, Al (same as materials)
 
 # Device configuration
 device: cuda  # cuda or cpu
