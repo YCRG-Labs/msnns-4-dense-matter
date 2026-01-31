@@ -290,50 +290,68 @@ def validate_trajectory_data(trajectory: TrajectoryData) -> bool:
 class GraphDataset(torch.utils.data.Dataset):
     """Dataset wrapper for graph data used in training.
     
-    This is a simple wrapper that provides batching functionality
-    for trajectory data.
+    This wrapper converts TrajectoryData to GraphData for training.
     """
     
-    def __init__(self, trajectories: List):
+    def __init__(self, trajectories: List, preprocessor=None):
         """Initialize dataset.
         
         Args:
-            trajectories: List of trajectory data
+            trajectories: List of TrajectoryData objects
+            preprocessor: Optional DataPreprocessor (will create one if not provided)
         """
         self.trajectories = trajectories
+        
+        # Create or use provided preprocessor
+        if preprocessor is None:
+            from .loader import DataPreprocessor
+            self.preprocessor = DataPreprocessor()
+            if trajectories:
+                self.preprocessor.fit(trajectories)
+        else:
+            self.preprocessor = preprocessor
     
     def __len__(self) -> int:
         """Return number of trajectories."""
         return len(self.trajectories)
     
     def __getitem__(self, idx: int):
-        """Get trajectory at index.
+        """Get trajectory at index as list of GraphData.
         
         Args:
             idx: Index
         
         Returns:
-            Trajectory data
+            List of GraphData objects (one per timestep)
         """
-        return self.trajectories[idx]
+        traj = self.trajectories[idx]
+        # Convert each BeamConfiguration state to GraphData
+        graph_data_list = []
+        for state in traj.states:
+            graph_data = self.preprocessor.transform(state)
+            graph_data_list.append(graph_data)
+        return graph_data_list
     
     @staticmethod
     def collate_fn(batch):
         """Collate function for batching trajectories.
         
-        This is a placeholder that should be customized based on
-        the specific data format.
-        
         Args:
-            batch: List of trajectory data
+            batch: List of trajectory data (each is a list of GraphData)
         
         Returns:
             Batched data dictionary
         """
-        # Simple collation - return as dictionary
-        # Users should customize this based on their data format
+        if not batch:
+            return {'trajectory': None, 'batch_data': None, 'single_data': None}
+        
+        # batch is a list of trajectories, each trajectory is a list of GraphData
+        # For autoregressive loss: use full trajectories
+        # For contrastive loss: use first frame from each trajectory
+        # For masked particle loss: use first frame from first trajectory
+        
         return {
-            'trajectory': batch if len(batch) > 0 else None,
-            'batch_data': batch if len(batch) > 1 else None,
-            'single_data': batch[0] if len(batch) > 0 else None
+            'trajectory': batch[0] if len(batch) > 0 else None,  # First trajectory for autoregressive
+            'batch_data': [traj[0] for traj in batch if len(traj) > 0] if len(batch) > 1 else None,  # First frames for contrastive
+            'single_data': batch[0][0] if len(batch) > 0 and len(batch[0]) > 0 else None  # Single frame for masked
         }
