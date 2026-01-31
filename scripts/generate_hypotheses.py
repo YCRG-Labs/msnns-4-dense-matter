@@ -45,7 +45,7 @@ def load_model(checkpoint_path: str, config_path: str = None, device: str = 'cpu
     print(f"Loading model from {checkpoint_path}...")
     
     # Load checkpoint
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     
     # Load config if provided, otherwise use config from checkpoint
     if config_path:

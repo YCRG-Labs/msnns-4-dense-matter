@@ -44,7 +44,7 @@ training:
 # Loss weights
 loss_weights:
   autoregressive: 1.0
-  contrastive: 0.5
+  contrastive: 0.1
   masked_particle: 0.5
 
 # Contrastive learning
