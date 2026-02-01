@@ -1,0 +1,81 @@
+{
+  "test_data": {},
+  "benchmarks": {
+    "plasma_oscillation": [
+      {
+        "material": "Fe",
+        "true_frequency": 0.8898075084724723,
+        "has_collective_mode": true
+      },
+      {
+        "material": "Si",
+        "true_frequency": 1.2547209048405568,
+        "has_collective_mode": true
+      },
+      {
+        "material": "W",
+        "true_frequency": 0.490420039645577,
+        "has_collective_mode": true
+      },
+      {
+        "material": "Al",
+        "true_frequency": 1.2801332226956608,
+        "has_collective_mode": true
+      },
+      {
+        "material": "Cu",
+        "true_frequency": 0.8341499047971702,
+        "has_collective_mode": true
+      }
+    ],
+    "beam_instability": [
+      {
+        "material": "Fe",
+        "true_growth_rate": 0.028480613087082655,
+        "has_collective_mode": true
+      },
+      {
+        "material": "Si",
+        "true_growth_rate": 0.035813770451665394,
+        "has_collective_mode": true
+      },
+      {
+        "material": "W",
+        "true_growth_rate": 0.019145384606766486,
+        "has_collective_mode": true
+      },
+      {
+        "material": "Al",
+        "true_growth_rate": 0.03629571886042462,
+        "has_collective_mode": true
+      },
+      {
+        "material": "Cu",
+        "true_growth_rate": 0.027280229914225303,
+        "has_collective_mode": true
+      }
+    ],
+    "single_particle": [
+      {
+        "material": "Fe",
+        "has_collective_mode": false
+      },
+      {
+        "material": "Si",
+        "has_collective_mode": false
+      },
+      {
+        "material": "W",
+        "has_collective_mode": false
+      },
+      {
+        "material": "Al",
+        "has_collective_mode": false
+      },
+      {
+        "material": "Cu",
+        "has_collective_mode": false
+      }
+    ]
+  }
+}

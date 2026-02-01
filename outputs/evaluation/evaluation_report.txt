@@ -1,0 +1,60 @@
+================================================================================
+MODEL EVALUATION REPORT
+================================================================================
+
+TEST DATA EVALUATION
+--------------------------------------------------------------------------------
+
+No test data results available
+
+
+SYNTHETIC BENCHMARK EVALUATION
+--------------------------------------------------------------------------------
+
+PLASMA_OSCILLATION:
+  Fe:
+    true_frequency: 0.8898075084724723
+    has_collective_mode: True
+  Si:
+    true_frequency: 1.2547209048405568
+    has_collective_mode: True
+  W:
+    true_frequency: 0.490420039645577
+    has_collective_mode: True
+  Al:
+    true_frequency: 1.2801332226956608
+    has_collective_mode: True
+  Cu:
+    true_frequency: 0.8341499047971702
+    has_collective_mode: True
+
+BEAM_INSTABILITY:
+  Fe:
+    true_growth_rate: 0.028480613087082655
+    has_collective_mode: True
+  Si:
+    true_growth_rate: 0.035813770451665394
+    has_collective_mode: True
+  W:
+    true_growth_rate: 0.019145384606766486
+    has_collective_mode: True
+  Al:
+    true_growth_rate: 0.03629571886042462
+    has_collective_mode: True
+  Cu:
+    true_growth_rate: 0.027280229914225303
+    has_collective_mode: True
+
+SINGLE_PARTICLE:
+  Fe:
+    has_collective_mode: False
+  Si:
+    has_collective_mode: False
+  W:
+    has_collective_mode: False
+  Al:
+    has_collective_mode: False
+  Cu:
+    has_collective_mode: False
+
+================================================================================

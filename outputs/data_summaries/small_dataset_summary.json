@@ -1,0 +1,20 @@
+{
+  "materials": [
+    "Si",
+    "Fe",
+    "W",
+    "Cu",
+    "Al"
+  ],
+  "n_particles": 100,
+  "duration": 25.0,
+  "dt": 0.5,
+  "num_timesteps": 50,
+  "benchmarks": {
+    "plasma_oscillation": "Plasma with known plasmon frequency",
+    "beam_instability": "Two-stream instability with known growth rate",
+    "single_particle": "Non-interacting particles (baseline)"
+  },
+  "generation_started": "2026-02-01T01:35:42.258459",
+  "generation_completed": "2026-02-01T01:35:58.773805"
+}
