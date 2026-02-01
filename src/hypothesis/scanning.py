@@ -1592,7 +1592,7 @@ def characterize_collective_mode_with_signatures(
     base_config: BeamConfiguration,
     critical_density: float,
     epistemic_uncertainty: float = 0.0,
-    t_max: float = 1000.0,
+    t_max: float = 50.0,  # Reduced from 1000.0 for faster execution
     dt: float = 1.0,
     momentum_range: Optional[np.ndarray] = None,
     device: str = 'cpu'
