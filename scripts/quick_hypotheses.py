@@ -126,7 +126,9 @@ def main():
                 if args.device == 'cuda':
                     torch.cuda.empty_cache()
                 
-                print(f"  Density {density:.2f}: latent norm = {z.norm().item():.4f}")
+                # Print more details about the latent vector
+                z_np = z.cpu().numpy().flatten()
+                print(f"  Density {density:.2f}: norm={z.norm().item():.4f}, mean={z_np.mean():.4f}, std={z_np.std():.4f}, min={z_np.min():.4f}, max={z_np.max():.4f}")
         
         latent_states = np.array(latent_states).squeeze()
         
@@ -143,7 +145,7 @@ def main():
         
         results[material] = {
             'densities': densities.tolist(),
-            'latent_norms': [np.linalg.norm(z) for z in latent_states],
+            'latent_norms': [float(np.linalg.norm(z)) for z in latent_states],
             'critical_density_estimate': float(critical_density)
         }
     
